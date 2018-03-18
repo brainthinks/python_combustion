@@ -2,6 +2,7 @@
 
 from cffi import FFI
 from ctypes import *
+import os
 
 lib_path = '../combustion/target/release/libcombustion_r.so'
 
@@ -31,7 +32,7 @@ base_dir = "/home/user/PlayOnLinux's virtual drives/halo_ce_new/drive_c/Program 
 
 # Information necessary to construct file names
 map_file = map_name + ".map"
-pc_base_dir = base_dir + "Halo/MAPS/"
+pc_base_dir = base_dir + "Halo/MAPS/halo_pc/"
 ce_base_dir = base_dir + "Halo Custom Edition/maps/"
 
 # Construct the file names
@@ -43,27 +44,36 @@ bitmaps_ce_path = ce_base_dir + "bitmaps.map"
 sounds_pc_path = pc_base_dir + "sounds.map"
 sounds_ce_path = ce_base_dir + "sounds.map"
 
-# Prepare the files
+# Prepare the files in Python
+map_data_file = open(source_map_path, 'rb')
+multiplayer_file = open(multiplayer_path, 'rb')
+bitmaps_pc_file = open(bitmaps_pc_path, 'rb')
+bitmaps_ce_file = open(bitmaps_ce_path, 'rb')
+sounds_pc_file = open(sounds_pc_path, 'rb')
+sounds_ce_file = open(sounds_ce_path, 'rb')
+
+# Calculate the number of bytes in each file
+buffer_len = ffi.sizeof(ffi.from_buffer(create_string_buffer(0)))
+map_data_len = os.fstat(map_data_file.fileno()).st_size
+multiplayer_len = os.fstat(multiplayer_file.fileno()).st_size
+bitmaps_pc_len = os.fstat(bitmaps_pc_file.fileno()).st_size
+bitmaps_ce_len = os.fstat(bitmaps_ce_file.fileno()).st_size
+sounds_pc_len = os.fstat(sounds_pc_file.fileno()).st_size
+sounds_ce_len = os.fstat(sounds_ce_file.fileno()).st_size
+
+# Prepare the files for the library
 buffer = ffi.from_buffer(create_string_buffer(0))
-map_data_raw = ffi.from_buffer(create_string_buffer(1))
-multiplayer_raw = ffi.from_buffer(create_string_buffer(2))
-bitmaps_pc_raw = ffi.from_buffer(create_string_buffer(3))
-bitmaps_ce_raw = ffi.from_buffer(create_string_buffer(4))
-sounds_pc_raw = ffi.from_buffer(create_string_buffer(5))
-sounds_ce_raw = ffi.from_buffer(create_string_buffer(6))
+map_data_raw = ffi.from_buffer(map_data_file.read(map_data_len))
+multiplayer_raw = ffi.from_buffer(multiplayer_file.read(multiplayer_len))
+bitmaps_pc_raw = ffi.from_buffer(bitmaps_pc_file.read(bitmaps_pc_len))
+bitmaps_ce_raw = ffi.from_buffer(bitmaps_ce_file.read(bitmaps_ce_len))
+sounds_pc_raw = ffi.from_buffer(sounds_pc_file.read(sounds_pc_len))
+sounds_ce_raw = ffi.from_buffer(sounds_ce_file.read(sounds_ce_len))
 
 # @todo - until I can figure out what multiplayer is...
 multiplayer_raw = ffi.from_buffer(create_string_buffer(0))
 
-# Calculate the number of bytes in each file
-buffer_len = ffi.sizeof(buffer)
-map_data_len = ffi.sizeof(map_data_raw)
-multiplayer_len = ffi.sizeof(multiplayer_raw)
-bitmaps_pc_len = ffi.sizeof(bitmaps_pc_raw)
-bitmaps_ce_len = ffi.sizeof(bitmaps_ce_raw)
-sounds_pc_len = ffi.sizeof(sounds_pc_raw)
-sounds_ce_len = ffi.sizeof(sounds_ce_raw)
-
+# Call the library method to convert the maps!
 result = libcombustion_r.convert_map_cd(
   buffer, buffer_len,
   map_data_raw, map_data_len,
@@ -72,6 +82,8 @@ result = libcombustion_r.convert_map_cd(
   bitmaps_ce_raw, bitmaps_ce_len,
   sounds_pc_raw, sounds_pc_len,
   sounds_ce_raw, sounds_ce_len,
+  # This last argument is needed to ensure that cffi passes the rest of the arguments correctly.
+  # I don't know why.
   0
 )
 

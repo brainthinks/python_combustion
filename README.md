@@ -9,6 +9,11 @@ This script will utilize the `combustion` library, written in Rust, that allows 
 I wrote this because the Combustion utility was written for Windows, and is not cli-friendly.  I want to be able to automate the conversion of all of my Halo maps, which is what this script was made to do.
 
 
+## Use
+
+Since I am not an experienced Python developer, this script loads the files into memory before doing any processing on them.  This means that until someone submits a pull request to make this script more efficient, or until I become more proficient in Python, you are required to have a few gigs of free memory to convert any map files.  I recommend at least 2 gigs of free memory.  I pulled this number out of almost thin air, so if you know that more memory is needed, please submit a pull request for this readme.
+
+
 ## Lessons Learned
 
 As a javascript developer, almost every aspect of this was new to me.  Rust, Python, C, libraries...  I had to understand what a library was, I had to understand how to make two different programming languages talk to each other, I had to learn that C was the bridge between them, I had to learn that a library was the infrastructure that made that bridge possible, I had to learn that a dynamic library was the required implementation of a library for an interpreted language like Python, I had to learn that Rust was created with the ability to do this in mind... I also had to become familiary with buffers and total length, which is not something I typically have to worry about in javascript-land.  Most things are dynamic, and streams can be avoided for medium-sized projects.
