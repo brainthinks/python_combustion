@@ -1,7 +1,5 @@
 # Python Script for Combustion Library
 
-Once I have a proof of concept working...
-
 In short, `combustion` allows you to convert the retail Halo PC map files into Halo CE map files.  If you paid for the retail Halo PC game, and want to the play the single player campaign using the updated Halo CE engine (and its extensions and mods, which are awesome), you either need to pirate the map files or convert them yourself from the map files that you legally own.  While pirating the map files is possible, I don't endorse that, not so much for legal reasons, but because you don't necessarily have any control over how those single player maps were created, and don't know what additional code, malicious or otherwise, they contain.  I don't pretend to know what `combustion` and `tritium` do, but I have the option of learning Rust and auditing the code myself.  If you download the converted map files from halomods, you don't have that option.
 
 This script will utilize the `combustion` library, written in Rust, that allows a Halo PC map to be converted to a map that Halo CE can use.
@@ -40,6 +38,27 @@ After getting some help on the Rust Discord channel, I was able to find a helpfu
 
 With `cffi` implemented, I was able to submit the proper arguments to the library function, as well as have the benefit of basic argument type validation, using `ffi.cdef`.
 
+However, the hardest part was still to come.  After a bit of trial and error and research, I was able to get file buffer reads to work.  Here is an extracted example:
+
+```python
+map_data_file = open(source_map_path, 'rb')
+map_data_len = os.fstat(map_data_file.fileno()).st_size
+map_data_raw = ffi.from_buffer(map_data_file.read(map_data_len))
+```
+
+I open the binary file buffer, which allows me to determine the length of the file and get the FFI C-compatible buffer.  Not a problem.  Getting a write buffer to work was a differnet story, however.  Getting a write buffer working was a story that was 8 straight hours in the making.  Special shoutout to Python Discord helper `lucy/looselystyled#7626`, whose help allowed me to write the converted map files to disk.  Thank you again :)
+
+Here is the binary file buffer pointer example that is needed to get the library to mutate a buffer pointer:
+
+```python
+buffer_file = open(target_map_path, 'rb+')
+buffer_len = 1000000000
+buffer_raw = ffi.new("char[]", buffer_len)
+buffer_pointer = ffi.addressof(buffer_raw)
+```
+
+And with that, the rest of the script writing was business as usual...
+
 
 ## Credits
 
@@ -48,6 +67,7 @@ With `cffi` implemented, I was able to submit the proper arguments to the librar
     * `<'a, 't, 's: 't> oberien<'a, 't>`
     * `#[macro_use(Restioson)]`
     * `Slikrick`
+* Python Discord channel member `lucy/looselystyled#7626` - withouth your help, I absolutely would have given up!  I am in your debt.
 
 
 ## References
@@ -61,4 +81,8 @@ With `cffi` implemented, I was able to submit the proper arguments to the librar
 
 ## @todo
 
+* write a function for readable buffers
+* write a function for writable buffers
+* fix `UserWarning` from `cffi`
+* is there a way to intelligently or dynamicall set the buffer length?
 * implement seamine - [https://opencarnage.net/index.php?/topic/6034-sea-mine/](https://opencarnage.net/index.php?/topic/6034-sea-mine/)
