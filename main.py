@@ -38,13 +38,14 @@ ce_base_dir = base_dir + "Halo Custom Edition/maps/"
 # Construct the file names
 target_map_path = ce_base_dir + "test/" + map_file
 source_map_path = pc_base_dir + map_file
-multiplayer_path = pc_base_dir + map_file # @todo
+multiplayer_path = pc_base_dir + map_file # @todo!!!
 bitmaps_pc_path = pc_base_dir + "bitmaps.map"
 bitmaps_ce_path = ce_base_dir + "bitmaps.map"
 sounds_pc_path = pc_base_dir + "sounds.map"
 sounds_ce_path = ce_base_dir + "sounds.map"
 
 # Prepare the files in Python
+buffer = create_string_buffer(0);
 map_data_file = open(source_map_path, 'rb')
 multiplayer_file = open(multiplayer_path, 'rb')
 bitmaps_pc_file = open(bitmaps_pc_path, 'rb')
@@ -53,7 +54,7 @@ sounds_pc_file = open(sounds_pc_path, 'rb')
 sounds_ce_file = open(sounds_ce_path, 'rb')
 
 # Calculate the number of bytes in each file
-buffer_len = ffi.sizeof(ffi.from_buffer(create_string_buffer(0)))
+buffer_len = 0;
 map_data_len = os.fstat(map_data_file.fileno()).st_size
 multiplayer_len = os.fstat(multiplayer_file.fileno()).st_size
 bitmaps_pc_len = os.fstat(bitmaps_pc_file.fileno()).st_size
@@ -61,8 +62,8 @@ bitmaps_ce_len = os.fstat(bitmaps_ce_file.fileno()).st_size
 sounds_pc_len = os.fstat(sounds_pc_file.fileno()).st_size
 sounds_ce_len = os.fstat(sounds_ce_file.fileno()).st_size
 
-# Prepare the files for the library
-buffer = ffi.from_buffer(create_string_buffer(0))
+# Prepare the files for the combustion library
+buffer_raw = ffi.from_buffer(buffer)
 map_data_raw = ffi.from_buffer(map_data_file.read(map_data_len))
 multiplayer_raw = ffi.from_buffer(multiplayer_file.read(multiplayer_len))
 bitmaps_pc_raw = ffi.from_buffer(bitmaps_pc_file.read(bitmaps_pc_len))
@@ -70,12 +71,11 @@ bitmaps_ce_raw = ffi.from_buffer(bitmaps_ce_file.read(bitmaps_ce_len))
 sounds_pc_raw = ffi.from_buffer(sounds_pc_file.read(sounds_pc_len))
 sounds_ce_raw = ffi.from_buffer(sounds_ce_file.read(sounds_ce_len))
 
-# @todo - until I can figure out what multiplayer is...
-multiplayer_raw = ffi.from_buffer(create_string_buffer(0))
+# Prepare the output file
 
 # Call the library method to convert the maps!
-result = libcombustion_r.convert_map_cd(
-  buffer, buffer_len,
+converted_map_file_size = libcombustion_r.convert_map_cd(
+  buffer_raw, buffer_len,
   map_data_raw, map_data_len,
   multiplayer_raw, multiplayer_len,
   bitmaps_pc_raw, bitmaps_pc_len,
@@ -87,4 +87,8 @@ result = libcombustion_r.convert_map_cd(
   0
 )
 
-print(result)
+# Write the converted map to a file
+buffer_file = open(target_map_path, 'wb')
+buffer_file.write(string_at(ffi.buffer(buffer_raw), converted_map_file_size))
+
+print(converted_map_file_size)

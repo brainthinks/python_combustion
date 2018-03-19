@@ -57,3 +57,8 @@ With `cffi` implemented, I was able to submit the proper arguments to the librar
 * [https://bheisler.github.io/post/calling-rust-in-python/](https://bheisler.github.io/post/calling-rust-in-python/)
 * [http://cffi.readthedocs.io/en/latest/ref.html#ffi-buffer-ffi-from-buffer](http://cffi.readthedocs.io/en/latest/ref.html#ffi-buffer-ffi-from-buffer)
 * [https://tentacles666.wordpress.com/2013/12/04/python-ctypes-efficiently-writing-binary-data/](https://tentacles666.wordpress.com/2013/12/04/python-ctypes-efficiently-writing-binary-data/)
+
+
+## @todo
+
+* implement seamine - [https://opencarnage.net/index.php?/topic/6034-sea-mine/](https://opencarnage.net/index.php?/topic/6034-sea-mine/)
