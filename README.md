@@ -12,19 +12,24 @@ I wrote this because the Combustion utility was written for Windows, and is not 
 Since I am not an experienced Python developer, this script loads the files into memory before doing any processing on them.  This means that until someone submits a pull request to make this script more efficient, or until I become more proficient in Python, you are required to have a few gigs of free memory to convert any map files.  I recommend at least 2 gigs of free memory.  I pulled this number out of almost thin air, so if you know that more memory is needed, please submit a pull request for this readme.
 
 
-### `main.py`
+### `examples/convert_all_retail_maps.sh`
 
-This file makes it easy to get up and running with converting your Halo PC maps.
+The all-inclusive script.  This will install and download all of the dependencies needed to use `pycombustion`, then convert all of your maps.  Here is an example of running it:
 
-`@todo` - add a real description here
+`./examples/convert_all_retail_maps.sh "/home/user/PlayOnLinux's virtual drives/halo_ce_new/drive_c"`
 
 
-### `src/combustion.py`
+### `examples/convert_all_retail_maps.py`
+
+A basic script that will utilize the `pycombustion` package.  It is intended for you to modify as needed, if needed.
+
+
+### `src/pycombustion/combustion.py`
 
 This file contains the bindings that make it easier to interact with the Combustion library.  If you know what you're doing, you can call `convert_map` or even `_convert_map` yourself.
 
 
-### `src/combustion.h`
+### `src/pycombustion/combustion.h`
 
 You'll only need this file if you're doing something custom.  This is the C header file that defines the interface for the functions that the Combustion library exposes.  This should probably be a part of the Combustion project, but for now, it will live here.
 
@@ -77,6 +82,14 @@ buffer_pointer = ffi.addressof(buffer_raw)
 And with that, the rest of the script writing was business as usual...
 
 
+### Python Conventions
+
+I'm positive that it's just my lack of experience, but I found Python best practices hard to find.  For instance, I didn't find the "source of truth" for how to properly document Python code.  It seems that `pydoc` is the tool of choice for generating documentation, but what documentation does `pydoc` look for?  I didn't spend a whole lot of time on it, but it didn't come up as quickly in google as I'm used to.  I decided instead that I would use a popular Python library to give me some guidance into how to write "good" Python package code.  I decided to use `nvbn/thefuck`, as it is the fourth most popular Python project on github, and probably less scary than `tensorflow`.  Here are some of my own personal notes:
+
+* using `import` statements at the top of the file does not result in "side-effects"
+* you can import relative files by appending to `sys.path` - see the examples folder
+
+
 ## Credits
 
 * `Halogen002` - without your excellent work, I would not have been able to use Halo in Linux on my terms, let alone create this wrapper script!
@@ -98,7 +111,10 @@ And with that, the rest of the script writing was business as usual...
 
 ## @todo
 
-* write instructions for using `main.py`
+* detect rust prior to trying to install it
 * should the header file exist in the combustion project?  Is there a best practice for generating a c header file from `pub unsafe extern "C"`?
 * is there a way to create a buffer/pointer where I do not have to pre-allocate the size?
 * implement seamine - [https://opencarnage.net/index.php?/topic/6034-sea-mine/](https://opencarnage.net/index.php?/topic/6034-sea-mine/)
+* where is the documentation for writing documentation that can be understood by pydoc?
+* what is the best practice for creating a package?  should I use `if __name__ == "__main__"`?
+* write this in javascript using `node-ffi`

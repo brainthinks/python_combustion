@@ -1,24 +1,6 @@
-#!/usr/bin/env python3
-
-import ctypes
 import os
+import ctypes
 from cffi import FFI
-
-###
-### Python bindings for the Combustion library
-###
-
-def _assert_file_exists(file_path):
-  if os.path.isfile(file_path) is False:
-    raise Exception("Could not find file " + file_path)
-
-def _backup_target_file(file_path):
-  if os.path.isfile(file_path) is True:
-    # @todo - backup file at target location, if it exists, in a timestamped directory
-    print("Found target file {}, going to overwrite...".format(file_path));
-  else:
-    print("Target file {} not found, going to create...".format(file_path));
-
 
 # @todo - do we have to pass ffi?
 def _create_read_only_buffer_tuple(ffi, file_path):
@@ -50,14 +32,21 @@ def _create_writable_buffer_tuple(ffi, length):
 
   return ( buffer_raw, buffer_pointer, length )
 
-# @todo - provide a default for lib_path
-def _convert_map(map_data_path, multiplayer_path, bitmaps_pc_path, bitmaps_ce_path, sounds_pc_path, sounds_ce_path, destination, lib_path):
+
+"""
+===================================
+Bindings for the Combustion Library
+===================================
+"""
+
+# @todo - provide a default for combustion_lib_path
+def _convert_map(map_data_path, multiplayer_path, bitmaps_pc_path, bitmaps_ce_path, sounds_pc_path, sounds_ce_path, destination, combustion_lib_path):
   # Initialize the FFI
   ffi = FFI()
   # Use the c header
   ffi.cdef(open(os.path.join(os.path.dirname(__file__), 'combustion.h')).read())
   # Import the dynamic library
-  libcombustion_r = ffi.dlopen(lib_path)
+  libcombustion_r = ffi.dlopen(combustion_lib_path)
 
   map_data = _create_read_only_buffer_tuple(ffi, map_data_path)
 
@@ -102,42 +91,3 @@ def _convert_map(map_data_path, multiplayer_path, bitmaps_pc_path, bitmaps_ce_pa
   buffer_file = open(destination, 'wb+')
   buffer_file.write(ffi.buffer(map_buffer[0]))
   buffer_file.close()
-
-
-# @todo - allow paths to be specified?
-# @todo - provide a default for lib_path
-def convert_map(map_name, ms_games_path, lib_path):
-  print(map_name)
-  # Default locations of the Halo PC and Halo CE map directories
-  pc_base_dir = ms_games_path + "Halo/MAPS/"
-  ce_base_dir = ms_games_path + "Halo Custom Edition/maps/"
-
-  # Construct the file names
-  target_map_path = ce_base_dir + map_name + ".map"
-  source_map_path = pc_base_dir + map_name + ".map"
-  # @todo
-  multiplayer_path = source_map_path
-  bitmaps_pc_path = pc_base_dir + "bitmaps.map"
-  bitmaps_ce_path = ce_base_dir + "bitmaps.map"
-  sounds_pc_path = pc_base_dir + "sounds.map"
-  sounds_ce_path = ce_base_dir + "sounds.map"
-
-  _assert_file_exists(source_map_path)
-  _assert_file_exists(multiplayer_path)
-  _assert_file_exists(bitmaps_pc_path)
-  _assert_file_exists(bitmaps_ce_path)
-  _assert_file_exists(sounds_pc_path)
-  _assert_file_exists(sounds_ce_path)
-
-  _backup_target_file(target_map_path)
-
-  _convert_map(
-    source_map_path,
-    multiplayer_path,
-    bitmaps_pc_path,
-    bitmaps_ce_path,
-    sounds_pc_path,
-    sounds_ce_path,
-    target_map_path,
-    lib_path,
-  )
