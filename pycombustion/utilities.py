@@ -25,6 +25,13 @@ HALO_MAPS = (
   ('d40', 'The Maw' ),
 )
 
+BLACKLIST = (
+  'ui',
+  'loc',
+  'sounds',
+  'bitmaps',
+)
+
 
 def _assert_file_exists(file_path):
   if os.path.isfile(file_path) is False:
@@ -42,6 +49,9 @@ def _backup_target_file(file_path):
 # @todo - allow paths to be specified?
 # @todo - provide a default for combustion_lib_path
 def convert_map(map_name, drive_c_path, combustion_lib_path, title = ''):
+  if map_name in BLACKLIST:
+    raise Exception("You are forbidden to convert {} - it will not work in Halo CE!".format(map_name))
+
   print("About to convert {}...".format(title or map_name))
 
   # Default locations of the Halo PC and Halo CE map directories

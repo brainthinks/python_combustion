@@ -33,12 +33,6 @@ def _create_writable_buffer_tuple(ffi, length):
   return ( buffer_raw, buffer_pointer, length )
 
 
-"""
-===================================
-Bindings for the Combustion Library
-===================================
-"""
-
 # @todo - provide a default for combustion_lib_path
 def _convert_map(map_data_path, multiplayer_path, bitmaps_pc_path, bitmaps_ce_path, sounds_pc_path, sounds_ce_path, destination, combustion_lib_path):
   # Initialize the FFI
