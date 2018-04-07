@@ -14,6 +14,8 @@ function installSystemDependencies () {
     exit 1
   fi
 
+  mkdir -p "dependencies"
+
   wget -O "dependencies/rust_installer.sh" "https://sh.rustup.rs"
 
   if [ $? -ne 0 ]; then
